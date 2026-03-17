@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GenLysinAI噬菌体 · 挑战杯（AI体验居中优化）</title>
+    <!-- 引入外部样式库 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <!-- 自定义样式 (完全合并，去重优化，并确保AI演示区内部内容居中) -->
+    <style>
+        :root {
+            --primary-color: #165DFF;
+            --secondary-color: #0A2463;
+            --accent-color: #3E92CC;
+            --light-color: #F0F7FF;
+            --dark-color: #0F172A;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            color: var(--dark-color);
+            background-color: #f8f9fa;
+        }
+        
+        /* 导航栏样式 */
+        .navbar {
+            background-color: var(--secondary-color) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+        
+        .nav-link:hover {
+            color: var(--accent-color) !important;
+        }
+        
+        /* 头部横幅 */
+        .hero-section {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://img.freepik.com/free-vector/abstract-biological-science-background_1035-18631.jpg') center/cover;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 板块通用样式 */
+        .section {
+            padding: 60px 0;
+        }
+        
+        .section-title {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: "";
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-color);
+            margin-top: 15px;
+        }
+        .section-title.text-center::after {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* 项目亮点卡片 */
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        /* 团队成员样式 —— 7人网格 */
+        .team-member {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .member-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 5px solid var(--light-color);
+            background-color: #f0f0f0; /* 占位背景 */
+        }
+        
+        /* 页脚样式 */
+        footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .hero-section { padding: 50px 0; }
+            .section { padding: 40px 0; }
+        }
+
+        /* ========== 核心指标卡片 & 极简对标表格 (完全保留) ========== */
+        .benchmark-badge {
+            background: linear-gradient(145deg, var(--primary-color), #0A7BFF);
+            color: white;
+            border-radius: 50px;
+            padding: 8px 20px;
+            display: inline-block;
+            font-weight: 600;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 14px rgba(22,93,255,0.3);
+        }
+        .metric-highlight {
+            background-color: white;
+            border-radius: 28px;
+            padding: 30px 25px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+            margin-bottom: 40px;
+            border: 1px solid rgba(62,146,204,0.15);
+        }
+        .metric-trio {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 20px;
+            margin: 30px 0 20px;
+        }
+        .metric-item {
+            flex: 1 1 120px;
+            text-align: center;
+            background: var(--light-color);
+            border-radius: 40px;
+            padding: 20px 10px;
+            transition: all 0.2s;
+        }
+        .metric-item .big-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            line-height: 1.2;
+        }
+        .metric-item .metric-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+            letter-spacing: 1px;
+        }
+        .metric-item.special .big-number { color: #00A86B; }
+        .comparison-table {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px -12px rgba(10,36,99,0.2);
+            margin: 30px 0 20px;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .comparison-table table { margin-bottom: 0; }
+        .comparison-table th {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: 600;
+            border-bottom: none;
+            padding: 18px 15px;
+            font-size: 1.1rem;
+        }
+        .comparison-table td {
+            padding: 18px 15px;
+            vertical-align: middle;
+            border-color: #f0f4fa;
+            font-weight: 500;
+        }
+        .comparison-table .fa-check-circle { color: #2b8c5e; font-size: 1.3rem; }
+        .comparison-table .fa-times-circle { color: #b91c1c; font-size: 1.3rem; }
+        .comparison-table .fa-minus-circle { color: #9ca3af; font-size: 1.3rem; }
+        .chip-bullet {
+            background-color: var(--light-color);
+            color: var(--secondary-color);
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-block;
+            margin: 4px 6px 4px 0;
+        }
+        .safety-badge {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .validation-row {
+            background-color: rgba(22,93,255,0.02);
+            border-radius: 20px;
+            padding: 20px 0;
+        }
+        .data-badge {
+            background: white;
+            border-radius: 30px;
+            padding: 12px 22px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            border: 1px solid rgba(22,93,255,0.2);
+            font-weight: 600;
+        }
+        .data-badge .text-primary { font-size: 1.4rem; margin-right: 5px; }
+
+        /* ========== 阶梯式商业模式/多渠道对接样式 ========== */
+        .business-ladder {
+            background: linear-gradient(180deg, #FFFFFF 0%, #F8FCFF 100%);
+            border-radius: 40px;
+            padding: 40px 30px;
+            box-shadow: 0 30px 60px -20px rgba(10,36,99,0.25);
+            margin-top: 30px;
+            border: 1px solid rgba(62,146,204,0.2);
+        }
+        .ladder-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px 20px;
+            justify-content: space-between;
+        }
+        .ladder-card {
+            flex: 1 1 260px;
+            background: white;
+            border-radius: 30px;
+            padding: 25px 20px;
+            border: 1px solid #eef4ff;
+            box-shadow: 0 10px 25px -12px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .ladder-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+        .ladder-card .year-tag {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            opacity: 0.8;
+            margin-bottom: 15px;
+            border-left: 6px solid var(--primary-color);
+            padding-left: 15px;
+        }
+        .ladder-card ul { padding-left: 5px; list-style: none; }
+        .ladder-card li {
+            margin-bottom: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .ladder-card li i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            min-width: 22px;
+            margin-top: 3px;
+        }
+        .ladder-card .badge-date {
+            background-color: var(--light-color);
+            color: var(--secondary-color);
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            padding: 3px 10px;
+            margin-left: 5px;
+        }
+        .progress-tagline {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px 25px;
+            margin: 40px 0 15px;
+        }
+        .progress-item {
+            background: white;
+            border-radius: 60px;
+            padding: 15px 30px;
+            box-shadow: 0 8px 18px -10px rgba(22,93,255,0.3);
+            border: 1px solid rgba(22,93,255,0.2);
+            font-weight: 600;
+            color: var(--secondary-color);
+            flex: 0 1 auto;
+        }
+        .progress-item i {
+            color: var(--primary-color);
+            margin-right: 10px;
+            font-size: 1.4rem;
+            vertical-align: middle;
+        }
+        .cooperation-wall {
+            background-color: rgba(22,93,255,0.03);
+            border-radius: 50px;
+            padding: 30px;
+            margin-top: 35px;
+            border: 1px dashed var(--accent-color);
+        }
+        .cooperation-title {
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        .partner-badge {
+            background: white;
+            border-radius: 40px;
+            padding: 12px 25px;
+            display: inline-block;
+            margin: 0 15px 15px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            border: 1px solid #e0ecff;
+            font-weight: 500;
+        }
+        .partner-badge i { color: #2b8c5e; margin-right: 8px; }
+        .partner-badge.hospital i { color: #c44536; }
+        .partner-badge.regulatory i { color: #b9801a; }
+
+        /* 噬菌体科学插画包装样式 */
+        .phage-artwork {
+            background-color: transparent;
+            border-radius: 16px;
+            max-width: 100%;
+            max-height: 380px;
+            object-fit: contain;
+            box-shadow: 0 20px 30px -8px rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s;
+        }
+        .phage-artwork:hover { transform: scale(1.02); }
+        .img-fallback-note {
+            background: rgba(0,0,0,0.5);
+            color: #ddd;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        /* ===== AI轻量化演示模块样式 (完全取自第二文件，并强化居中) ===== */
+        .ai-experience-btn {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 60px;
+            padding: 16px 48px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            transition: 0.25s;
+            box-shadow: 0 10px 25px -5px rgba(22,93,255,0.4);
+            cursor: pointer;
+            display: inline-block;
+            margin-bottom: 30px;
+        }
+        .ai-experience-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.02);
+            border-color: var(--primary-color);
+        }
+        .ai-experience-btn i {
+            margin-right: 12px;
+            font-size: 1.8rem;
+            vertical-align: middle;
+        }
+        /* AI演示核心区 - 初始隐藏，并且内容强制左右居中 */
+        #aiDemoSection {
+            display: none;
+            margin: 40px auto;          /* 水平居中 */
+            background: #ffffff;
+            border-radius: 48px;
+            padding: 40px;
+            box-shadow: 0 40px 60px -20px #0A246330;
+            border: 1px solid #165DFF25;
+            max-width: 1320px;           /* 与container最大宽度对齐，保证居中视觉 */
+            width: 100%;
+        }
+        #aiDemoSection.show { display: block; }
+
+        /* 让内部所有直接子元素也保持相对父容器自然居中（bootstrap row自带flex居中） */
+        #aiDemoSection .stats-panel,
+        #aiDemoSection .selector-row,
+        #aiDemoSection .workflow-steps,
+        #aiDemoSection #resultCompare,
+        #aiDemoSection .arch-grid,
+        #aiDemoSection .case-grid {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 核心看板 - 三数据 */
+        .stats-panel {
+            background: white;
+            border-radius: 36px;
+            box-shadow: 0 20px 35px -8px rgba(22,93,255,0.12);
+            padding: 30px 40px;
+            margin-bottom: 30px;
+            border: 1px solid #e9eef4;
+        }
+        .stat-item {
+            text-align: center;
+            border-right: 1px dashed #ced8e8;
+        }
+        .stat-item:last-child { border-right: none; }
+        .stat-number { font-size: 3rem; font-weight: 800; color: #165DFF; line-height: 1.2; }
+        .stat-label { font-size: 1rem; color: #0F172A; font-weight: 500; margin-top: 8px; }
+        .stat-sub {
+            font-size: 0.9rem; color: #3E92CC; background: #F0F7FF;
+            display: inline-block; padding: 4px 16px; border-radius: 40px; margin-top: 10px;
+        }
+        /* 输入行 */
+        .selector-row {
+            background: #F8FCFF; border-radius: 100px; padding: 16px 25px;
+            border: 1px solid #165DFF30; display: flex; flex-wrap: wrap;
+            align-items: center; justify-content: space-between;
+        }
+        .bacteria-select {
+            background: white; border: 1px solid #ced8e8; border-radius: 60px;
+            padding: 10px 30px 10px 20px; font-size: 1.1rem; width: 320px;
+        }
+        .btn-start-ai {
+            background: #165DFF; color: white; border: none; border-radius: 60px;
+            padding: 10px 40px; font-size: 1.2rem; font-weight: 600;
+        }
+        /* 工作流步骤 */
+        .workflow-steps {
+            margin-top: 30px; background: #F0F7FF; border-radius: 40px; padding: 30px;
+        }
+        .step-item {
+            display: flex; align-items: center; gap: 15px; background: white;
+            border-radius: 28px; padding: 15px 20px; margin-bottom: 15px;
+            border-left: 6px solid #165DFF; opacity: 0.4;
+        }
+        .step-item.active { opacity: 1; }
+        .step-icon {
+            width: 45px; height: 45px; background: #165DFF10; border-radius: 30px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: #165DFF;
+        }
+        .student-highlight {
+            background: #00A86B10; color: #00A86B; padding: 3px 15px;
+            border-radius: 30px; font-size: 0.85rem; margin-left: 10px;
+        }
+        /* 结果卡片 */
+        .result-card {
+            background: linear-gradient(145deg, #0A2463, #165DFF); color: white;
+            border-radius: 30px; padding: 25px; margin-top: 30px;
+        }
+        .result-seq {
+            background: #ffffff20; border-radius: 50px; padding: 12px 20px; font-family: monospace;
+        }
+        .compare-badge {
+            background: white; color: #0A2463; border-radius: 60px; padding: 12px 20px; display: inline-block;
+        }
+        /* 技术模块 */
+        .arch-grid { display: flex; gap: 20px; margin: 30px 0; }
+        .arch-card {
+            flex: 1; background: #F8FCFF; border-radius: 30px; padding: 25px 15px;
+            text-align: center; cursor: pointer; border: 1px solid #165DFF20;
+        }
+        .arch-card:hover { border-color: #165DFF; }
+        /* 成果案例 */
+        .case-grid { display: flex; gap: 25px; margin-top: 20px; }
+        .case-item {
+            background: white; border-radius: 30px; padding: 20px; flex: 1;
+            border: 1px solid #e2e9f5;
+        }
+        .mic-chart {
+            background: #F0F7FF; border-radius: 20px; padding: 12px; text-align: center; margin: 12px 0;
+        }
+        /* 弹窗 */
+        .modal-pop {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; border-radius: 48px; padding: 40px;
+            box-shadow: 0 40px 70px #0F172A80; z-index: 2000; max-width: 500px;
+            border: 2px solid #165DFF;
+        }
+        .modal-pop.show { display: block; }
+        .modal-overlay {
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+            background: #0F172A80; z-index: 1999;
+        }
+        .modal-overlay.show { display: block; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 (完全保留) -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fa fa-flask me-2"></i>GenLysinAI噬菌体</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">首页</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#intro">项目介绍</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">核心亮点</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#core-metrics">核心指标</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#business-milestone">商业落地</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#team">参赛团队</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#process">参赛历程</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">联系我们</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 头部横幅 (噬菌体插画) -->
+    <section id="home" class="hero-section mt-5">
+        <div class="container">
+            <div class="hero-content">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h1 class="display-4 fw-bold mb-4">GenLysinAI噬菌体</h1>
+                        <h2 class="h4 mb-5">挑战杯大学生创业计划竞赛参赛项目</h2>
+                        <p class="lead mb-4">基于人工智能的噬菌体裂解酶基因设计与应用研究</p>
+                        <a href="#intro" class="btn btn-light btn-lg">了解更多 <i class="fa fa-arrow-right ms-2"></i></a>
+                    </div>
+                    <div class="col-lg-6 d-none d-lg-block">
+                        <div class="img-wrap text-center">
+                            <img class="phage-artwork" src="https://media.sciencephoto.com/image/f0167882/800wm/F0167882-Bacteriophages_infecting_bacterium,_illustration.jpg" alt="噬菌体侵染细菌科学插画" loading="eager" onerror="this.onerror=null; this.style.display='none'; this.parentNode.innerHTML+='<div class=\'img-fallback-note\'><i class=\'fa fa-exclamation-triangle\'></i> 科学插画加载失败</div>';">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI智能设计体验按钮 (放置在项目介绍上方) -->
+    <div class="container text-center" style="margin-top: 30px;">
+        <div class="ai-experience-btn" id="aiExperienceToggle">
+            <i class="fa fa-magic"></i> 体验 AI 智能设计
+        </div>
+    </div>
+
+    <!-- AI轻量化演示模块 (点击按钮后展开) 现已完全居中于父容器 -->
+    <div class="container" id="aiDemoSection">
+        <!-- 核心看板：三数据 -->
+        <div class="stats-panel">
+            <div class="row g-0">
+                <div class="col-md-4 stat-item">
+                    <div class="stat-number">91.7%</div>
+                    <div class="stat-label">靶向裂解酶研发周期</div>
+                    <div class="stat-sub"><i class="fa fa-clock-o"></i> 传统9个月 → AI 3周 (学生团队优化算法)</div>
+                </div>
+                <div class="col-md-4 stat-item">
+                    <div class="stat-number">12x</div>
+                    <div class="stat-label">湿实验命中率提升</div>
+                    <div class="stat-sub"><i class="fa fa-line-chart"></i> 传统5% → AI 60% (学生团队数据标注+微调)</div>
+                </div>
+                <div class="col-md-4 stat-item">
+                    <div class="stat-number">85%</div>
+                    <div class="stat-label">综合研发成本降低</div>
+                    <div class="stat-sub"><i class="fa fa-money"></i> 传统100% → AI 15% (学生优化筛选逻辑)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 极简输入层 -->
+        <div class="selector-row">
+            <span class="fw-bold text-primary"><i class="fa fa-bug"></i> 靶标致病菌类型</span>
+            <select class="bacteria-select" id="bacteriaSelect">
+                <option value="金黄色葡萄球菌">金黄色葡萄球菌 (MRSA)</option>
+                <option value="大肠杆菌">大肠杆菌 (E.coli)</option>
+                <option value="痤疮丙酸杆菌">痤疮丙酸杆菌 (痤疮)</option>
+            </select>
+            <button class="btn-start-ai" id="startDesignBtn"><i class="fa fa-play"></i> 开始智能设计</button>
+        </div>
+
+        <!-- 动态流程演示 (2D动画模拟) 初始隐藏 -->
+        <div class="workflow-steps" id="workflowSteps" style="display: none;">
+            <div class="step-item" id="step1"><div class="step-icon"><i class="fa fa-database"></i></div><div class="step-desc">① 数据调取：从 PhageWiki 数据库（学生团队自主标注 2.8万+条数据）调取靶菌噬菌体序列 <span class="student-highlight">学生完成数据标注</span></div></div>
+            <div class="step-item" id="step2"><div class="step-icon"><i class="fa fa-code"></i></div><div class="step-desc">② 序列生成：AI 模型生成 1,000+ 条候选裂解酶序列 <span class="student-highlight">学生团队优化生成网络</span></div></div>
+            <div class="step-item" id="step3"><div class="step-icon"><i class="fa fa-filter"></i></div><div class="step-desc">③ 多目标筛选：抑菌活性/室温稳定性/成本等5大指标（学生团队设定优化权重）</div></div>
+            <div class="step-item" id="step4"><div class="step-icon"><i class="fa fa-check-circle"></i></div><div class="step-desc">④ 结果输出：最优裂解酶序列 + 核心性能参数 <span class="student-highlight">学生团队实测验证</span></div></div>
+        </div>
+
+        <!-- 结果对比层 (初始隐藏) -->
+        <div id="resultCompare" style="display: none;">
+            <div class="result-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 style="color:white;"><i class="fa fa-dna me-2"></i>最优裂解酶序列 (学生团队实测验证)</h4>
+                    <span class="compare-badge"><i class="fa fa-flask"></i> 抑菌率 99.9% · 室温稳定12个月</span>
+                </div>
+                <div class="result-seq mt-3" id="resultSeq">>Lysin_SA_mr07 (针对金黄色葡萄球菌) ATGGCTTACAAAGCTAGCTTAGGATCC... (半衰期延长41%)</div>
+                <div class="row mt-4">
+                    <div class="col-md-6"><div style="background:#ffffff20; border-radius:25px; padding:15px;"><h5 style="color:white"><i class="fa fa-times-circle"></i> 传统研发</h5><p style="color:white;">耗时：9个月<br>命中率：5%<br>成本：100%</p></div></div>
+                    <div class="col-md-6"><div style="background:white; border-radius:25px; padding:15px; color:#0A2463;"><h5><i class="fa fa-check-circle text-primary"></i> AI 研发 (学生优化)</h5><p>耗时：3周<br>命中率：60%<br>成本：15%</p></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模型技术优势可视化模块 -->
+        <div style="margin: 40px 0;">
+            <h4 class="fw-bold"><i class="fa fa-cubes text-primary me-2"></i>模型技术优势 · 点击模块查看</h4>
+            <div class="arch-grid">
+                <div class="arch-card" id="clickDb"><i class="fa fa-database fa-2x"></i><h5>PhageWiki数据库</h5><p>学生标注2.8万+条</p></div>
+                <div class="arch-card" id="clickOptim"><i class="fa fa-sliders fa-2x"></i><h5>多目标优化模块</h5><p>学生调优5大指标</p></div>
+                <div class="arch-card" id="clickIter"><i class="fa fa-repeat fa-2x"></i><h5>闭环迭代模块</h5><p>实验数据反向微调</p></div>
+            </div>
+        </div>
+
+        <!-- 成果验证模块 -->
+        <div style="margin: 40px 0;">
+            <h4 class="fw-bold"><i class="fa fa-certificate text-primary me-2"></i>AI设计成果验证 · 学生团队实测</h4>
+            <div class="case-grid">
+                <div class="case-item">
+                    <h5>金黄色葡萄球菌裂解酶</h5>
+                    <p><span class="badge bg-primary">AI设计耗时 2.5天</span> <span class="badge bg-success">实测抑菌率 99.9%</span></p>
+                    <div class="mic-chart"><i class="fa fa-area-chart me-2"></i>MIC实验结果图 (点击放大) <i class="fa fa-search-plus ms-3" style="cursor:pointer;" onclick="alert('MIC实验数据：0.25μg/ml 完全抑菌')"></i></div>
+                </div>
+                <div class="case-item">
+                    <h5>痤疮丙酸杆菌裂解酶</h5>
+                    <p><span class="badge bg-primary">AI设计耗时 3天</span> <span class="badge bg-success">实测抑菌率 99.2%</span></p>
+                    <div class="mic-chart"><i class="fa fa-area-chart me-2"></i>MIC实验结果图 (点击放大) <i class="fa fa-search-plus ms-3" style="cursor:pointer;" onclick="alert('MIC实验数据：0.5μg/ml 完全抑菌')"></i></div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <button class="btn btn-outline-primary" style="border-radius:60px;" onclick="alert('检测报告缩略图：所有指标符合国家标准，学生团队全项检测')"><i class="fa fa-file-text-o me-2"></i>查看权威检测报告</button>
+            </div>
+        </div>
+        <p class="text-muted small text-center mt-3"><i class="fa fa-graduation-cap"></i> 湖北汽车工业学院大学生创业团队自主研发 · 轻量化演示</p>
+    </div>
+
+    <!-- 原有内容：项目介绍 (完全保留) -->
+    <section id="intro" class="section bg-white">
+        <div class="container">
+            <h2 class="section-title text-center">项目介绍</h2>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <p class="lead text-center mb-5">GenLysinAI噬菌体项目聚焦于解决抗生素耐药性这一全球公共卫生难题，<br>创新性地将人工智能技术与噬菌体裂解酶研究相结合，开发高效、精准的新型抗菌制剂。</p>
+                    <div class="row">
+                        <div class="col-md-6 mb-4"><h4><i class="fa fa-check-circle text-primary me-2"></i>研究背景</h4><p>随着抗生素滥用导致的耐药菌不断涌现，传统抗菌手段面临严峻挑战。噬菌体作为天然的细菌天敌，其裂解酶具有特异性强、不易产生耐药性等优势，成为新一代抗菌药物的重要研究方向。</p></div>
+                        <div class="col-md-6 mb-4"><h4><i class="fa fa-check-circle text-primary me-2"></i>技术路线</h4><p>通过AI算法预测和优化噬菌体裂解酶基因序列，结合基因工程技术实现高效表达，利用高通量筛选平台验证抗菌活性，最终开发出可产业化的新型抗菌产品。</p></div>
+                        <div class="col-md-6 mb-4"><h4><i class="fa fa-check-circle text-primary me-2"></i>应用场景</h4><p>可广泛应用于临床抗感染治疗、畜牧业抗菌、食品保鲜、环境消毒等多个领域，市场前景广阔，具有重要的社会和经济价值。</p></div>
+                        <div class="col-md-6 mb-4"><h4><i class="fa fa-check-circle text-primary me-2"></i>创新价值</h4><p>首次将深度学习模型应用于噬菌体裂解酶的理性设计，大幅提升了研发效率，降低了开发成本，为抗菌药物研发提供了全新的技术范式。</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- 核心亮点 -->
+<section id="features" class="section bg-light">
+    <div class="container">
+        <h2 class="section-title text-center">核心亮点</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="fa-calculator"></i></div>
+                    <h3 class="h5 mb-3"><i class="fa fa-microchip text-primary me-2"></i>AI智能设计</h3>
+                    <p>自主研发的GenLysinAI算法模型，可精准预测裂解酶的结构与功能，研发周期缩短60%以上。</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="fa fa-flask"></i></div>
+                    <h3 class="h5 mb-3"><i class="fa fa-dna text-primary me-2"></i>高效表达体系</h3>
+                    <p>构建了高效的原核表达系统，裂解酶表达量提升3倍，生产成本仅为传统方法的1/5。</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="fa fa-shield"></i></div>
+                    <h3 class="h5 mb-3"><i class="fa fa-bolt text-primary me-2"></i>广谱抗菌活性</h3>
+                    <p>对多种耐药菌裂解效果显著，抗菌谱覆盖20余种致病菌，有效率达95%以上。</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="fa fa-industry"></i></div>
+                    <h3 class="h5 mb-3"><i class="fa fa-cogs text-primary me-2"></i>产业化前景</h3>
+                    <p>已完成中试工艺优化，产品稳定性好，符合工业化生产要求。</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="fa fa-file-text-o"></i></div>
+                    <h3 class="h5 mb-3"><i class="fa fa-copyright text-primary me-2"></i>知识产权布局</h3>
+                    <p>已申请发明专利5项，实用新型2项，形成完整知识产权保护体系。</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon"><i class="fa fa-users"></i></div>
+                    <h3 class="h5 mb-3"><i class="fa fa-handshake-o text-primary me-2"></i>产学研结合</h3>
+                    <p>与多家三甲医院、生物制药企业合作，加速成果转化。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- 核心指标 + 对标表格 -->
+    <section id="core-metrics" class="section bg-white">
+        <div class="container">
+            <h2 class="section-title text-center">精准抑菌·无耐药风险</h2>
+            <p class="lead text-center mb-4">核心指标全面领先现有方案</p>
+            <div class="metric-trio">
+                <div class="metric-item"><i class="fa fa-clock-o fa-3x text-primary mb-2"></i><div class="big-number">5min</div><div class="metric-label">见效更快</div><small>起效速度</small></div>
+                <div class="metric-item special"><i class="fa fa-line-chart fa-3x text-primary mb-2"></i><div class="big-number">99%</div><div class="metric-label">效率更高</div><small>抑菌率</small></div>
+                <div class="metric-item"><i class="fa fa-money fa-3x text-primary mb-2"></i><div class="big-number">1/5</div><div class="metric-label">成本更省</div><small>生产成本</small></div>
+            </div>
+            <div class="metric-highlight">
+                <div class="row align-items-center mb-4">
+                    <div class="col-md-6">
+                        <span class="benchmark-badge"><i class="fa fa-dna me-2"></i>第三方检测验证</span>
+                        <h4 class="fw-bold" style="color: var(--secondary-color);">耐药金葡菌抑菌率 <span class="text-primary">99%</span></h4>
+                        <p class="text-muted">10倍MIC浓度下，不损伤皮肤有益菌 · 无皮肤刺激性，细胞毒性0级</p>
+                        <div class="safety-badge mt-3"><i class="fa fa-shield me-2"></i>安全性：无皮肤刺激性，细胞毒性0级</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="data-badge d-inline-block mb-2"><span class="text-primary fw-bold">99%</span> 耐药金葡菌抑菌率</div>
+                        <div class="data-badge d-inline-block ms-2"><span class="text-primary fw-bold">0级</span> 细胞毒性</div>
+                    </div>
+                </div>
+                <div class="comparison-table mt-4">
+                    <table class="table table-hover align-middle">
+                        <thead><tr><th>对比维度</th><th>传统抗生素</th><th>市面益生元</th><th>GenLysinAI噬菌体</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>靶向性</strong></td><td><i class="fa fa-times-circle me-2"></i>广谱杀菌，破坏菌群</td><td><i class="fa fa-minus-circle me-2 text-secondary"></i>无抑菌作用</td><td><i class="fa fa-check-circle me-2"></i>精准杀有害菌，保护有益菌</td></tr>
+                            <tr><td><strong>耐药风险</strong></td><td><i class="fa fa-times-circle me-2"></i>极高</td><td><i class="fa fa-minus-circle me-2 text-secondary"></i>无</td><td><i class="fa fa-check-circle me-2"></i>几乎无</td></tr>
+                            <tr><td><strong>安全性</strong></td><td>副作用常见</td><td>安全</td><td><span class="fw-bold">无皮肤刺激性，细胞毒性0级</span></td></tr>
+                            <tr><td><strong>起效速度</strong></td><td>数小时</td><td>效果不确切</td><td><span class="text-primary fw-bold">5分钟起效</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row validation-row p-3 mt-4">
+                <div class="col-sm-4 text-center"><i class="fa fa-bug fa-2x text-primary mb-2"></i><h5>耐药金葡菌抑菌率</h5><p class="h2 text-primary fw-bold">99%</p><span class="badge bg-light text-dark">第三方检测</span></div>
+                <div class="col-sm-4 text-center"><i class="fa fa-leaf fa-2x text-primary mb-2"></i><h5>皮肤有益菌保护</h5><p class="h6">10倍MIC浓度下 <br> 不受损</p></div>
+                <div class="col-sm-4 text-center"><i class="fa fa-flask fa-2x text-primary mb-2"></i><h5>细胞毒性</h5><p class="h2 text-primary fw-bold">0级</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 阶梯式商业落地 -->
+    <section id="business-milestone" class="section bg-light">
+        <div class="container">
+            <h2 class="section-title text-center">阶梯式商业落地<span class="ms-3" style="font-size: 0.9rem; background: var(--primary-color); color: white; padding: 5px 20px; border-radius: 50px;">已完成多渠道产业化对接</span></h2>
+            <div class="business-ladder">
+                <div class="progress-tagline">
+                    <span class="progress-item"><i class="fa fa-check-circle-o"></i> 广州10+头部ODM企业对接</span>
+                    <span class="progress-item"><i class="fa fa-check-circle-o"></i> 3家签订样品开发协议</span>
+                    <span class="progress-item"><i class="fa fa-check-circle-o"></i> 北京协和·北大人民医院合作意向</span>
+                </div>
+                <div class="ladder-grid">
+                    <div class="ladder-card"><div class="year-tag">初期 2026</div><ul><li><i class="fa fa-flask"></i> 研发多场景系列产品2款</li><li><i class="fa fa-file-text"></i> 完成4篇核心论文发表</li><li><i class="fa fa-balance-scale"></i> 功效护肤原料授权</li></ul></div>
+                    <div class="ladder-card"><div class="year-tag">中期 2027</div><ul><li><i class="fa fa-globe"></i> 推广国内多个省份</li><li><i class="fa fa-handshake-o"></i> 与3家企业达成长期合作</li><li><i class="fa fa-medkit"></i> 医研敷料技术共研</li></ul></div>
+                    <div class="ladder-card"><div class="year-tag">后期 2028</div><ul><li><i class="fa fa-rocket"></i> 抗菌酶新药License-out</li><li><i class="fa fa-bank"></i> 完成多中心临床验证</li><li><i class="fa fa-cart-plus"></i> 进入海外市场</li></ul></div>
+                </div>
+                <div class="cooperation-wall">
+                    <div class="cooperation-title"><i class="fa fa-handshake-o text-primary me-2"></i>已落地进展与产业对接</div>
+                    <div><span class="partner-badge"><i class="fa fa-check-circle"></i> 广州10+头部ODM</span><span class="partner-badge hospital"><i class="fa fa-hospital-o"></i> 北京协和医院</span><span class="partner-badge regulatory"><i class="fa fa-shield"></i> 药监合规对接</span><span class="partner-badge"><i class="fa fa-flask"></i> 妆字号产品备案</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 参赛团队 (7人) 头像文件名1~7.png，保留占位符 -->
+    <section id="team" class="section bg-white">
+        <div class="container">
+            <h2 class="section-title text-center">参赛团队</h2>
+            <div class="row">
+                <div class="col-md-3 team-member"><img src="1.png" alt="李飞" class="member-img" onerror="this.src='https://via.placeholder.com/150?text=1'"><h4>李飞</h4><p class="text-muted">指导老师<br>生物工程</p></div>
+                <div class="col-md-3 team-member"><img src="2.png" alt="熊鹏俊" class="member-img" onerror="this.src='https://via.placeholder.com/150?text=2'"><h4>熊鹏俊</h4><p class="text-muted">总经理<br>计算机技术与科学</p></div>
+                <div class="col-md-3 team-member"><img src="3.png" alt="吴显赫" class="member-img" onerror="this.src='https://via.placeholder.com/150?text=3'"><h4>吴显赫</h4><p class="text-muted">技术总监<br>计算机技术与科学</p></div>
+                <div class="col-md-3 team-member"><img src="4.png" alt="黄顺" class="member-img" onerror="this.src='https://via.placeholder.com/150?text=4'"><h4>黄顺</h4><p class="text-muted">外交总监<br>大数据</p></div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-3 team-member"><img src="5.png" alt="杨舒涵" class="member-img" onerror="this.src='https://via.placeholder.com/150?text=5'"><h4>杨舒涵</h4><p class="text-muted">运营总监<br>大数据</p></div>
+                <div class="col-md-3 team-member"><img src="6.png" alt="张翰军" class="member-img" onerror="this.src='https://via.placeholder.com/150?text=6'"><h4>张翰军</h4><p class="text-muted">财务总监<br>软件工程</p></div>
+                <div class="col-md-3 team-member"><img src="7.png" alt="陈志轩" class="member-img" onerror="this.src='https://via.placeholder.com/150?text=7'"><h4>陈志轩</h4><p class="text-muted">市场总监<br>计算机技术与科学</p></div>
+                <div class="col-md-3 d-none d-md-block"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 参赛历程 -->
+    <section id="process" class="section bg-light">
+        <div class="container">
+            <h2 class="section-title text-center">参赛历程</h2>
+            <div class="row"><div class="col-lg-8 mx-auto">
+                <div class="card mb-4"><div class="card-body"><h5 class="card-title text-primary">2025年3月</h5><p>项目立项，组建跨学科团队。</p></div></div>
+                <div class="card mb-4"><div class="card-body"><h5 class="card-title text-primary">2025年5月</h5><p>完成算法模型构建，实现AI预测。</p></div></div>
+                <div class="card mb-4"><div class="card-body"><h5 class="card-title text-primary">2025年7月</h5><p>抗菌活性提升80%，通过校级初赛。</p></div></div>
+                <div class="card mb-4"><div class="card-body"><h5 class="card-title text-primary">2025年9月</h5><p>获得省级挑战杯金奖。</p></div></div>
+            </div></div>
+        </div>
+    </section>
+
+    <!-- 联系我们 -->
+    <section id="contact" class="section bg-white">
+        <div class="container">
+            <h2 class="section-title text-center">联系我们</h2>
+            <div class="row"><div class="col-lg-6 mx-auto">
+                <div class="card p-4"><form><div class="mb-3"><label class="form-label">姓名</label><input type="text" class="form-control"></div><div class="mb-3"><label class="form-label">邮箱</label><input type="email" class="form-control"></div><div class="mb-3"><label class="form-label">留言</label><textarea class="form-control" rows="3"></textarea></div><button type="submit" class="btn btn-primary w-100">提交</button></form></div>
+                <div class="text-center mt-5"><p class="h5 mb-3">联系方式</p><p><i class="fa fa-envelope-o text-primary me-2"></i>3327008209@qq.com</p><p><i class="fa fa-phone text-primary me-2"></i>177-XXXX-XXXX</p><p><i class="fa fa-map-marker text-primary me-2"></i>湖北汽车工业学院</p></div>
+            </div></div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6"><h5><i class="fa fa-flask me-2"></i>GenLysinAI噬菌体</h5><p class="mt-3">挑战杯大学生创业计划竞赛参赛项目<br>© 2025 版权所有</p></div>
+                <div class="col-md-6 text-md-end"><h5>关注我们</h5><div class="mt-3"><a href="#" class="text-white me-3"><i class="fa fa-weixin fa-2x"></i></a><a href="#" class="text-white me-3"><i class="fa fa-weibo fa-2x"></i></a><a href="#" class="text-white"><i class="fa fa-github fa-2x"></i></a></div></div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 弹窗 (用于技术模块) -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="modal-pop" id="modalContent"><h3 id="modalTitle">数据库详情</h3><p id="modalBody">学生团队自主标注噬菌体序列2.8万+条，涵盖皮肤致病菌相关数据，获2项软件著作权。</p><div class="text-end mt-4"><button class="btn btn-primary" onclick="closeModal()">关闭</button></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // AI体验按钮：展开/收起演示模块
+        const toggleBtn = document.getElementById('aiExperienceToggle');
+        const demoSection = document.getElementById('aiDemoSection');
+        toggleBtn.addEventListener('click', function() {
+            demoSection.classList.toggle('show');
+            if (demoSection.classList.contains('show')) {
+                demoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        // 模拟设计流程
+        const startBtn = document.getElementById('startDesignBtn');
+        const stepsDiv = document.getElementById('workflowSteps');
+        const resultDiv = document.getElementById('resultCompare');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        const resultSeq = document.getElementById('resultSeq');
+        const bacteriaSelect = document.getElementById('bacteriaSelect');
+
+        startBtn.addEventListener('click', function() {
+            stepsDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+            [step1, step2, step3, step4].forEach(s => s.classList.remove('active'));
+
+            setTimeout(() => step1.classList.add('active'), 200);
+            setTimeout(() => step2.classList.add('active'), 800);
+            setTimeout(() => step3.classList.add('active'), 1400);
+            setTimeout(() => {
+                step4.classList.add('active');
+                let bacteria = bacteriaSelect.value;
+                if (bacteria.includes('金黄色葡萄球菌')) resultSeq.innerHTML = '>Lysin_SA_mr07 (金黄色葡萄球菌) ATGGCTTACAAAGCTAGCTTAGGATCC... 半衰期延长41% 抑菌率99.9%';
+                else if (bacteria.includes('大肠杆菌')) resultSeq.innerHTML = '>Lysin_EC_mr12 (大肠杆菌) ATGCCGTTAGACCTAGCATTGGGAT... 半衰期延长37% 抑菌率99.4%';
+                else resultSeq.innerHTML = '>Lysin_CP_mr03 (痤疮丙酸杆菌) ATGGCTAGCGTTCCGAAACTTAGT... 半衰期延长52% 抑菌率99.2%';
+                resultDiv.style.display = 'block';
+            }, 2000);
+        });
+
+        // 技术弹窗
+        const modal = document.getElementById('modalContent');
+        const overlay = document.getElementById('modalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        window.closeModal = function() { modal.classList.remove('show'); overlay.classList.remove('show'); };
+        document.getElementById('clickDb')?.addEventListener('click', function() {
+            modalTitle.innerText = 'PhageWiki数据库 (学生团队自主构建)';
+            modalBody.innerText = '学生团队标注2.8万+条噬菌体序列，覆盖皮肤相关致病菌，已获2项软件著作权(2025SR08921, 2025SR08922)。';
+            modal.classList.add('show'); overlay.classList.add('show');
+        });
+        document.getElementById('clickOptim')?.addEventListener('click', function() {
+            modalTitle.innerText = '多目标优化模块 (学生团队优化)';
+            modalBody.innerText = '学生团队设定5大核心指标：抑菌活性(35%)、室温稳定性(25%)、真核表达兼容性(20%)、成本(12%)、安全性(8%)。';
+            modal.classList.add('show'); overlay.classList.add('show');
+        });
+        document.getElementById('clickIter')?.addEventListener('click', function() {
+            modalTitle.innerText = '闭环迭代模块';
+            modalBody.innerText = '学生团队用32组湿实验数据反向微调模型，使预测准确率提升18%。';
+            modal.classList.add('show'); overlay.classList.add('show');
+        });
+        overlay.addEventListener('click', closeModal);
+    </script>
+</body>
+</html>
